@@ -1,0 +1,19 @@
+* {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  max-height: 100vh;
+  background-color: #232422;
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+}
