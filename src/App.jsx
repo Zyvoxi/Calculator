@@ -8,6 +8,7 @@ import {
   Button,
 } from '@mui/material';
 import BackspaceIcon from '@mui/icons-material/Backspace';
+import { evaluate } from 'mathjs';
 
 const Display = styled(Typography)({
   color: 'white',
@@ -17,6 +18,10 @@ const Display = styled(Typography)({
   margin: 'auto 10px',
   width: '100%',
   maxWidth: 'inherit',
+  textWrap: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  direction: 'rtl',
 });
 
 const StyledButton = styled(Button)({
@@ -27,7 +32,7 @@ const StyledButton = styled(Button)({
   color: 'white',
   fontSize: '2em',
   fontWeight: 'bold',
-  borderRadius: 5,
+  borderRadius: 10,
   padding: 10,
   margin: '0 0 10px 0',
   textTransform: 'none',
@@ -54,16 +59,88 @@ export default function App() {
     }, 120); // Duração do escurecimento em milissegundos
   };
 
+  const invert = (value) => {
+    // Remove espaços desnecessários
+    const trimmedExpression = value.trim();
+
+    // Divide a expressão em partes (assume que é separada por espaço)
+    const parts = trimmedExpression.split(' ');
+
+    // Inverte a ordem das partes e junta de volta como string
+    return parts.reverse().join(' ');
+  };
+
+  const handleCalculator = (num) => {
+    /* eslint-disable indent */
+    switch (true) {
+      case num === ' ' || num === '\u200B':
+        break;
+      case num === '=': {
+        try {
+          const sanitisedDisplay = display
+            .replace(/x/g, '*')
+            .replace(/,/g, '.');
+          const calc = evaluate(sanitisedDisplay);
+          setDisplay(`${calc}`.replace('.', ','));
+          break;
+        } catch (error) {
+          console.error(error);
+          setDisplay('Error');
+          break;
+        }
+      }
+      case num === 'AC':
+        setDisplay('0');
+        break;
+      case num === '-' || num === '+' || num === '/' || num === 'X': {
+        const lastElement = display.trim().split(' ').pop();
+
+        if (isNaN(lastElement.replace(',', '.'))) {
+          setDisplay(
+            (prev) => ` ${prev.trim().slice(0, -1) + num.toLowerCase()} `,
+          );
+        } else {
+          setDisplay((prev) => `${prev} ${num.toLowerCase()} `);
+        }
+        break;
+      }
+
+      case num === ',':
+        setDisplay((prevDisplay) => `${prevDisplay},`);
+        break;
+      case !isNaN(num):
+        if (display === '0') {
+          setDisplay(num);
+          break;
+        }
+        setDisplay((prevDisplay) => prevDisplay + num);
+        break;
+      default:
+        setDisplay((prevDisplay) =>
+          prevDisplay[prevDisplay.length - 1] === 'r'
+            ? '0'
+            : prevDisplay[prevDisplay.length - 1] === 'y'
+              ? '0'
+              : prevDisplay.length > 1
+                ? prevDisplay.trim().slice(0, -1)
+                : '0',
+        );
+        console.log(num);
+    }
+    /* eslint-enable indent */
+  };
+
   return (
     <Container
       maxWidth='xl'
       sx={{ height: '90vh', display: 'flex', padding: 0 }}
     >
       <Paper
-        elevation={15}
+        elevation={10}
         sx={{
           bgcolor: 'transparent',
           display: 'inherit',
+          borderRadius: 5,
           my: 'auto',
           mx: 'auto',
         }}
@@ -72,7 +149,7 @@ export default function App() {
           sx={{
             bgcolor: '#313131',
             display: 'inherit',
-            borderRadius: 2.5,
+            borderRadius: 5,
             flexDirection: 'column',
             height: '100%',
             width: '400px',
@@ -80,15 +157,16 @@ export default function App() {
         >
           <Box
             sx={{
-              bgcolor: '#0003',
+              bgcolor: '#0213',
               display: 'inherit',
-              borderRadius: 'inherit',
+              borderRadius: 5,
               height: '150px',
               m: 1,
               textAlign: 'right',
+              boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.5)',
             }}
           >
-            <Display>{display}</Display>
+            <Display>{invert(display)}</Display>
           </Box>
           <Box
             sx={{
@@ -105,60 +183,7 @@ export default function App() {
                 key={num}
                 onClick={() => {
                   handleClick(num);
-                  /* eslint-disable indent */
-                  switch (true) {
-                    case num === ' ' || num === '\u200B':
-                      break;
-                    case num === '=': {
-                      try {
-                        const res = eval(
-                          display.replace('x', '*').replace(',', '.'),
-                        );
-                        setDisplay(`${res}`);
-                        break;
-                        // eslint-disable-next-line no-unused-vars
-                      } catch (error) {
-                        setDisplay('Error');
-                        break;
-                      }
-                    }
-                    case num === 'AC':
-                      setDisplay('0');
-                      break;
-                    case num === '-' ||
-                      num === '+' ||
-                      num === '/' ||
-                      num === 'X': {
-                      const lastElement = display.trim().split(' ').pop();
-
-                      if (isNaN(lastElement.replace(',', '.'))) {
-                        setDisplay(
-                          (prev) =>
-                            ` ${prev.trim().slice(0, -1) + num.toLowerCase()} `,
-                        );
-                      } else {
-                        setDisplay((prev) => `${prev} ${num.toLowerCase()} `);
-                      }
-                      break;
-                    }
-
-                    case num === ',':
-                      setDisplay((prevDisplay) => `${prevDisplay},`);
-                      break;
-                    case !isNaN(num):
-                      if (display === '0') {
-                        setDisplay(num);
-                        break;
-                      }
-                      setDisplay((prevDisplay) => prevDisplay + num);
-                      break;
-                    default:
-                      setDisplay((prevDisplay) =>
-                        prevDisplay.length > 1 ? prevDisplay.slice(0, -1) : '0',
-                      );
-                      console.log(num);
-                  }
-                  /* eslint-enable indent */
+                  handleCalculator(num);
                 }}
                 disableRipple={true}
                 sx={{
