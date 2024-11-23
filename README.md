@@ -52,4 +52,4 @@ Uma calculadora simples, feita com **React** e **Material-UI**.
 
 ## Licença
 
-Este projeto está licenciado sob a **MIT License**. Veja o arquivo [LICENSE](./LICENSE) para mais detalhes.
+Este projeto está licenciado sob a **MIT License**. Veja o arquivo [LICENSE](./LICENSE.md) para mais detalhes.
