@@ -11,7 +11,7 @@ import BackspaceIcon from '@mui/icons-material/Backspace';
 import { evaluate } from 'mathjs';
 
 const Display = styled(Typography)({
-  color: 'white',
+  color: '#00000085',
   fontSize: '4em',
   letterSpacing: -1,
   fontWeight: 'bold',
@@ -41,7 +41,7 @@ const StyledButton = styled(Button)({
 });
 
 const buttons = [
-  ['AC', 'X', '/', <BackspaceIcon key='backspace' />],
+  ['AC', '\u00D7', '/', <BackspaceIcon key='backspace' />],
   ['7', '8', '9', '-'],
   ['4', '5', '6', '+'],
   ['1', '2', '3', '='],
@@ -56,18 +56,25 @@ export default function App() {
     setClicked(key);
     setTimeout(() => {
       setClicked(null);
-    }, 120); // Duração do escurecimento em milissegundos
+    }, 100); // Duração do escurecimento em milissegundos
   };
 
   const invert = (value) => {
-    // Remove espaços desnecessários
-    const trimmedExpression = value.trim();
-
-    // Divide a expressão em partes (assume que é separada por espaço)
-    const parts = trimmedExpression.split(' ');
-
     // Inverte a ordem das partes e junta de volta como string
-    return parts.reverse().join(' ');
+    return value
+      .trim()
+      .split(/(?<=\d),(?=\s)|\s+/) // Divide por vírgulas isoladas ou espaços
+      .map((part) => {
+        // Mantém números inteiros ou decimais intactos
+        if (part.match(/^\d+,\d+$|^\d+$/)) {
+          return part; // Número decimal ou inteiro intacto
+        }
+        return part.split(''); // Divide outros casos em caracteres
+      })
+      .flat() // Achata o array
+      .reverse() // Inverte a ordem
+      .join('') // Junta sem espaços
+      .replace(/([+\-×/])/g, ' $1 ');
   };
 
   const handleCalculator = (num) => {
@@ -78,7 +85,7 @@ export default function App() {
       case num === '=': {
         try {
           const sanitisedDisplay = display
-            .replace(/x/g, '*')
+            .replace(/\u00D7/g, '*')
             .replace(/,/g, '.');
           const calc = evaluate(sanitisedDisplay);
           setDisplay(`${calc}`.replace('.', ','));
@@ -92,15 +99,13 @@ export default function App() {
       case num === 'AC':
         setDisplay('0');
         break;
-      case num === '-' || num === '+' || num === '/' || num === 'X': {
+      case num === '-' || num === '+' || num === '/' || num === '\u00D7': {
         const lastElement = display.trim().split(' ').pop();
 
         if (isNaN(lastElement.replace(',', '.'))) {
-          setDisplay(
-            (prev) => ` ${prev.trim().slice(0, -1) + num.toLowerCase()} `,
-          );
+          setDisplay((prev) => ` ${prev.trim().slice(0, -1) + num} `);
         } else {
-          setDisplay((prev) => `${prev} ${num.toLowerCase()} `);
+          setDisplay((prev) => `${prev} ${num} `);
         }
         break;
       }
@@ -166,7 +171,7 @@ export default function App() {
               boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.5)',
             }}
           >
-            <Display>{invert(display).replace(/x/g, '\u00D7')}</Display>
+            <Display>{invert(display)}</Display>
           </Box>
           <Box
             sx={{
