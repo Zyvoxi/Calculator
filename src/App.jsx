@@ -166,7 +166,7 @@ export default function App() {
               boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.5)',
             }}
           >
-            <Display>{invert(display)}</Display>
+            <Display>{invert(display).replace(/x/g, '\u00D7')}</Display>
           </Box>
           <Box
             sx={{
