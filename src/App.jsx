@@ -45,7 +45,7 @@ const buttons = [
   ['7', '8', '9', '-'],
   ['4', '5', '6', '+'],
   ['1', '2', '3', '='],
-  [' ', '0', ',', '\u200B'],
+  [' ', '0', ',', ','],
 ];
 
 export default function App() {
@@ -130,7 +130,6 @@ export default function App() {
                 ? prevDisplay.trim().slice(0, -1)
                 : '0',
         );
-        console.log(num);
     }
     /* eslint-enable indent */
   };
