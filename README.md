@@ -11,7 +11,7 @@ Uma calculadora simples, feita com **React** e **Material-UI**.
 1. Clone este repositório:
 
    ```bash
-   git clone https://github.com/seu-usuario/calculator.git
+   git clone https://github.com/zyvoxi/calculator.git
    ```
 
 2. Navegue até o diretório do projeto:
